@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Borrowed Minutes — a data story about total solar eclipses</title>
+  <meta name="description" content="A five-millennia data story about the brief minutes when the Moon hides the Sun—and the people who watch." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;1,400&family=Xanh+Mono:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Black-and-white fill patterns used by the charts (type = texture, not colour) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="pat-H" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="2.6"/></pattern>
+      <pattern id="pat-A" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="3" x2="6" y2="3" stroke="#000" stroke-width="1.4"/></pattern>
+      <pattern id="pat-P" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#fff"/><circle cx="2.5" cy="2.5" r="1" fill="#000"/></pattern>
+    </defs>
+  </svg>
+
+  <!-- Chapter navigation: 5 dots, jumps to each screen -->
+  <nav id="chapters" aria-label="Chapters">
+    <a href="#s1" aria-label="1 Hook"><span>1</span></a>
+    <a href="#s2" aria-label="2 Anatomy"><span>2</span></a>
+    <a href="#s3" aria-label="3 Ledger"><span>3</span></a>
+    <a href="#s4" aria-label="4 Minutes"><span>4</span></a>
+    <a href="#s5" aria-label="5 Ahead"><span>5</span></a>
+  </nav>
+
+  <section id="s1" class="screen hero">
+    <p class="kicker">A data story · NASA Five Millennium Catalog of Solar Eclipses</p>
+    <h1>Borrowed<br />Minutes</h1>
+    <p class="lede">For a few minutes, the Moon can hide the Sun. Across the centuries, people have watched, measured and learned beneath that shadow. The next moments of totality are already on the calendar.</p>
+
+    <div class="bars" id="hero-bars" aria-label="Bar lengths compare the duration of totality on each eclipse's central line at greatest eclipse"></div>
+    <p class="note">Each bar measures totality on the eclipse's central line, at greatest eclipse. The 2186 eclipse is a prediction.</p>
+    <a class="scroll" href="#s2">Scroll ↓</a>
+  </section>
+
+  <section id="s2" class="screen">
+    <p class="kicker">1 · Anatomy</p>
+    <h2>Four ways the Moon crosses the Sun</h2>
+    <div class="two-col">
+      <p>A solar eclipse can happen only at New Moon, when the Moon passes between Earth and the Sun. It must also pass near one of two places where its orbit crosses Earth's. The Moon's shadow then sweeps across a narrow part of our planet. The kind of eclipse depends on which part of that shadow reaches you.</p>
+      <dl class="types">
+        <dt class="T">Total</dt><dd>The darkest part of the shadow, the umbra, reaches Earth. The Moon covers the Sun.</dd>
+        <dt class="A">Annular</dt><dd>The Moon appears too small to cover the Sun. A bright ring remains around it.</dd>
+        <dt class="H">Hybrid</dt><dd>The shadow shifts along its path: the eclipse is annular in some places and total in others.</dd>
+        <dt class="P">Partial</dt><dd>The lighter outer shadow, the penumbra, reaches Earth. Part of the Sun stays visible.</dd>
+      </dl>
+    </div>
+
+    <h3>Across five millennia, the four types appear in different numbers</h3>
+    <div class="share" id="type-share" aria-label="Share of eclipse types across 5,000 years"></div>
+    <p class="note" id="share-note"></p>
+
+    <h3>Eclipses from 2001 to 2100, by magnitude</h3>
+    <p>For total, annular and hybrid eclipses, magnitude compares the apparent sizes of the Moon and Sun. Above 1, the Moon appears larger; below 1, the Sun does. A hybrid shifts between the two along its path. For a partial eclipse, magnitude is the fraction of the Sun's diameter covered.</p>
+    <div class="legend" id="strip-legend" role="group" aria-label="Filter by eclipse type"></div>
+    <div id="strip-partial" class="chart"></div>
+    <div id="strip-central" class="chart"></div>
+    <p class="note">Each dot marks one of 224 eclipses from 2001 to 2100. Focus or hover on a dot to see its date and duration.</p>
+  </section>
+
+  <section id="s3" class="screen">
+    <p class="kicker">2 · The ledger</p>
+    <h2>A ledger of changing shadows</h2>
+    <p class="big-claim" id="ledger-claim"></p>
+    <div class="legend" id="ledger-legend" role="group" aria-label="Chart view">
+      <button id="btn-all" aria-pressed="true">All types</button>
+      <button id="btn-hybrid" aria-pressed="false">Hybrids only</button>
+    </div>
+    <div id="ledger" class="chart"></div>
+    <p class="note">One bar for each century, from 2000 BCE to 3000 CE. The marked centuries contain the three eclipses in the next chapter. Select a mark to visit its story.</p>
+    <p class="interp"><strong>Interpretation, not fact:</strong> Hybrid counts rise and fall across the centuries. The catalogue records the pattern, but not its cause.</p>
+  </section>
+
+  <section id="s4" class="screen">
+    <p class="kicker">3 · The minutes</p>
+    <h2>What people saw in the shadow</h2>
+    <p>Three eclipses, centuries apart. Each story pairs NASA's catalogue figures with a sourced account of what people saw and studied.</p>
+    <div class="tabs" id="case-tabs" role="tablist" aria-label="Case studies"></div>
+    <article id="case" class="card" aria-live="polite"></article>
+  </section>
+
+  <section id="s5" class="screen">
+    <p class="kicker">4 · Ahead</p>
+    <h2>The next minutes are dated</h2>
+    <p class="big-claim" id="ahead-claim"></p>
+    <div class="legend" id="ahead-legend" role="group" aria-label="Order the bars">
+      <button id="btn-date" aria-pressed="true">By date</button>
+      <button id="btn-rank" aria-pressed="false">Longest first</button>
+    </div>
+    <div id="ahead" class="chart"></div>
+    <p class="note">Each bar marks an upcoming total eclipse with a catalogued duration, through 2100. Duration is measured on the central line at greatest eclipse—not at every place along its path. NASA says the largest uncertainty in its predictions comes from changes in Earth's rotation.</p>
+    <p class="ending">Minutes pass. Records remain. The next dates are already on the calendar.</p>
+  </section>
+
+  <section id="resources" class="screen">
+    <p class="kicker">Resources</p>
+    <ul>
+      <li>Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC), <a href="https://eclipse.gsfc.nasa.gov/SEcat5/catalog.html">Five Millennium Catalog of Solar Eclipses</a>.</li>
+      <li><a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE-0599--0500.html">NASA catalogue, 599–500 BCE</a> · <a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE1901-2000.html">1901–2000</a> · <a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE2001-2100.html">2001–2100</a>.</li>
+      <li><a href="https://arxiv.org/abs/1307.2095">Review of the Thales eclipse-prediction debate</a> (arXiv:1307.2095).</li>
+      <li>Dyson, Eddington &amp; Davidson (1920), <i>Philosophical Transactions of the Royal Society A</i> 220, 291. <a href="https://doi.org/10.1098/rsta.1920.0009">doi:10.1098/rsta.1920.0009</a>.</li>
+      <li>Longair (2015), commentary on the 1919 eclipse results. <a href="https://doi.org/10.1098/rsta.2014.0287">doi:10.1098/rsta.2014.0287</a>.</li>
+      <li>Kennefick (2009), <i>Physics Today</i></li>
+      <li>Bruns (2018), <i>Classical and Quantum Gravity</i></li>
+    </ul>
+    <p class="note">Design and development: Giulia Rinaldo | Introduction to Information Design, Aalto University</p>
+  </section>
+
+  <div id="tip" role="tooltip"></div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
