@@ -236,7 +236,7 @@ svg text { font-family: var(--font-label); font-size: 13px; fill: var(--ink); }
 .label-box { fill: var(--paper); }
 .penumbra-dot { fill: #000; }
 
-#strip-central svg, #strip-partial svg, #world-map svg { display: block; width: 100%; height: auto; overflow: visible; }
+#strip-central svg, #strip-partial svg, #world-map svg, #ahead-map svg { display: block; width: 100%; height: auto; overflow: visible; }
 
 .map-sea { fill: var(--paper); stroke: var(--ink); stroke-width: 0.8; }
 .map-grid { fill: none; stroke: var(--ink); stroke-width: 0.4; stroke-dasharray: 1 4; }
@@ -255,7 +255,6 @@ svg text { font-family: var(--font-label); font-size: 13px; fill: var(--ink); }
 .map-legend span { display: flex; align-items: center; gap: 6px; }
 .map-legend .map-legend-title { font-weight: 500; }
 
-#eclipse-wipe { display: none; position: fixed; left: 50%; border-radius: 50%; aspect-ratio: 1 / 1; max-width: none; max-height: none; background: #fff; mix-blend-mode: difference; pointer-events: none; z-index: 5; }
 
 .facts-table p { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 6px 0; border-bottom: 1px solid var(--ink); font-family: var(--font-label); font-size: 14px; }
 .facts-table b { text-decoration: none; font-weight: 500; white-space: nowrap; }
@@ -285,7 +284,8 @@ svg text { font-family: var(--font-label); font-size: 13px; fill: var(--ink); }
 .shadow-earth { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
 
 #strip-central { margin-bottom: 12px; }
-#strip-partial { margin: 12px 0 0; }
+
+#strip-partial { margin-top: 64px; padding-top: 64px; border-top: 1px solid var(--ink); }
 
 #strip-legend { margin: -14px 0 42px; }
 
@@ -311,10 +311,46 @@ svg text { font-family: var(--font-label); font-size: 13px; fill: var(--ink); }
 #strip-partial + .frame-bottom { margin-top: 42px; }
 .screen > :last-child { margin-bottom: 0; }
 
-#ahead-legend { margin: -14px 0 42px; }
+#ahead-legend { margin: 0 0 40px; }
 #ahead + .frame-bottom { margin-top: 42px; }
 
 #sources .kicker + .prose { margin-top: 0; }
 #sources { padding-bottom: 120px; }
 #sources ul.prose + .kicker { margin-top: 72px; }
 #sources ul.prose + ul.prose { margin-top: 0; }
+
+/* Map of the central lines in the last chapter */
+.track { pointer-events: none; fill: none; stroke: var(--ink); stroke-width: 1.1; opacity: 0.6; }
+.track-hit { fill: none; stroke: transparent; stroke-width: 12; cursor: pointer; pointer-events: stroke; }
+.tracks-active .track { opacity: 0.3; }
+.tracks-active .track.on { opacity: 1; stroke-width: 2.6; }
+#ahead-map { margin-bottom: 40px; }
+@media (min-width: 1100px) { #ahead-map { margin-left: -70px; margin-right: -70px; max-width: none; } }
+
+/* The first figure stays pinned while the page scrolls through its track */
+.scrub-pin { position: sticky; background: var(--paper); }
+.scrub-pin .frame { margin-top: 56px; }
+.scrub-pin .rule { margin-top: 48px; margin-bottom: 0; }
+
+/* Detail of the chosen coming eclipse, under the map */
+.ahead-detail { display: flex; flex-direction: column; align-items: center; gap: 40px; margin: 0; font-family: var(--font-label); }
+.detail-main { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 32px; width: 560px; max-width: 100%; }
+.ahead-detail .clock { width: 96px; flex: none; }
+.detail-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; font-size: 14px; letter-spacing: 0.02em; }
+.detail-text b { font-size: 17px; font-weight: 500; }
+.detail-buttons { display: flex; gap: 8px; }
+.detail-buttons button { padding: 6px 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; }
+.detail-buttons button:disabled { opacity: 0.3; cursor: default; }
+.ahead-detail + .frame-bottom { margin-top: 40px; }
+.clocks-block { max-width: var(--figure-width); margin: 56px auto 0; }
+.scrub-track { margin-bottom: 56px; }
+
+.eclipsed {
+  --paper: #000;
+  --ink: #fff;
+  color: #fff;
+  padding-top: 110px;
+  background:
+    radial-gradient(circle 100vw at 50% 100%, #000 calc(100% - 1px), transparent 100%) top / 100% 100vw no-repeat,
+    linear-gradient(#000, #000) 0 calc(100vw - 1px) / 100% 100% no-repeat;
+}
