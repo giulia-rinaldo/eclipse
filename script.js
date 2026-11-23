@@ -299,6 +299,7 @@ function drawScrubber() {
   const moonRadius = sunRadius * magnitude;
   const reach = sunRadius + moonRadius;
   const width = 1000, height = 370, cx = 500, cy = 185;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const svg = el("svg", { viewBox: "0 0 " + width + " " + height, "aria-hidden": "true" }, box);
 
   drawSun(svg, cx, cy, sunRadius);
@@ -318,7 +319,7 @@ function drawScrubber() {
   slider.min = -1000;
   slider.max = 1000;
   slider.step = 5;
-  slider.value = -700;
+  slider.value = -1000;
   slider.setAttribute("aria-label", "Position of the Moon, from the start of the eclipse to the end");
   control.append(slider);
   control.insertAdjacentHTML("afterbegin", "<span class='control-start'>start</span>");
@@ -345,8 +346,45 @@ function drawScrubber() {
     sentence.textContent = text;
     slider.setAttribute("aria-valuetext", text);
   }
+
+  // The figure is pinned to the screen while the page scrolls past it. The page does not stop:
+  // an invisible stretch of extra height (the "track") keeps the figure in place, and how far
+  // we are through that stretch decides where the Moon is. A long track makes the Moon slow.
+  // The pinned group is the opening paragraph, the figure and the hairline under it.
+  const figure = box.closest("figure");
+  const intro = document.querySelector("p.prose.first");
+  const rule = figure.nextElementSibling;
+  const track = document.createElement("div");
+  track.className = "scrub-track";
+  const pin = document.createElement("div");
+  pin.className = "scrub-pin";
+  intro.parentNode.insertBefore(track, intro);
+  track.appendChild(pin);
+  pin.append(intro, figure, rule);
+
+  function sizeTrack() {
+    if (reduceMotion) { return; }
+    // centred vertically; if the group is taller than the window it sits at the top
+    pin.style.top = Math.max(8, (window.innerHeight - pin.offsetHeight) / 2) + "px";
+    track.style.height = (pin.offsetHeight + window.innerHeight * 2.5) + "px";
+  }
+  function followPage() {
+    if (reduceMotion) { return; }
+    const distance = track.offsetHeight - pin.offsetHeight;
+    const travelled = -track.getBoundingClientRect().top + parseFloat(pin.style.top || 0);
+    const progress = Math.max(0, Math.min(1, travelled / distance));
+    slider.value = Math.round((progress * 2 - 1) * 200) * 5;
+    update();
+  }
+
+  // The slider can move the Moon by hand; the next scroll (down or up) takes it again.
   slider.addEventListener("input", update);
+  window.addEventListener("scroll", followPage);
+  window.addEventListener("resize", () => { sizeTrack(); followPage(); });
+  if (reduceMotion) { slider.value = -700; }
+  sizeTrack();
   update();
+  followPage();
 }
 
 function drawTypeCards() {
@@ -531,8 +569,9 @@ function drawStrips() {
   addTypeFilter("strip-legend", [document.getElementById("strip-central"), document.getElementById("strip-partial")]);
 }
 
-function drawWorld() {
-  const box = document.getElementById("world-map");
+// The base map (sea, graticule, continents), shared by the town map and the "ahead" map.
+// Returns the svg and the two functions that turn longitude and latitude into screen coordinates.
+function makeWorldMap(box, label) {
   const width = 1000, margin = 14;
 
   function project(lon, lat) {
@@ -559,7 +598,7 @@ function drawWorld() {
     return d;
   }
 
-  const svg = el("svg", { viewBox: "0 0 " + width + " " + height, role: "img", "aria-label": "World map: every town of 15,000 people or more, bigger dot for an earlier next total eclipse" }, box);
+  const svg = el("svg", { viewBox: "0 0 " + width + " " + height, role: "img", "aria-label": label }, box);
 
   const edge = [];
   for (let lat = -90; lat <= 90; lat += 5) { edge.push([180, lat]); }
@@ -576,6 +615,14 @@ function drawWorld() {
   let land = "";
   for (let i = 0; i < LAND.length; i++) { land = land + pathOf(LAND[i]) + "Z"; }
   el("path", { d: land, class: "map-land" }, svg);
+
+  return { svg: svg, width: width, height: height, screenX: screenX, screenY: screenY };
+}
+
+function drawWorld() {
+  const box = document.getElementById("world-map");
+  const map = makeWorldMap(box, "World map: every town of 15,000 people or more, bigger dot for an earlier next total eclipse");
+  const svg = map.svg, width = map.width, height = map.height, screenX = map.screenX, screenY = map.screenY;
 
   const towns = [];
   TOWNS.split("\n").forEach((line) => {
@@ -753,6 +800,75 @@ function drawAhead() {
     "Between now and 2100, " + facts.upcoming.length + " total solar eclipses with catalogued durations remain. " + longPart + ". " +
     "The shortest, on " + dateText(shortest.date) + ", will last just " + words(shortest.duration_s) + ".";
 
+  // How many of the towns on the town map (towns.js) each coming eclipse crosses
+  const townCount = {};
+  TOWNS.split("\n").forEach((line) => {
+    const index = line.split("|")[4];
+    if (index !== "") { townCount[TOWN_ECLIPSES[Number(index)]] = (townCount[TOWN_ECLIPSES[Number(index)]] || 0) + 1; }
+  });
+
+  // The map: the central line of each coming total eclipse, from NASA's path tables (tracks.js).
+  const map = makeWorldMap(document.getElementById("ahead-map"), "World map: the central line of each total eclipse still to come before 2101");
+  map.svg.classList.add("tracks-active");
+  const lines = {};
+  facts.upcoming.forEach((e) => {
+    const points = TRACKS[e.date];
+    if (!points) { return; }
+    // A line that crosses the date line (longitude 180) is cut in two so it does not run across the whole map.
+    let d = "";
+    for (let i = 0; i < points.length; i++) {
+      const jump = i > 0 && Math.abs(points[i][0] - points[i - 1][0]) > 180;
+      d = d + (i === 0 || jump ? "M" : "L") + map.screenX(points[i][0], points[i][1]).toFixed(1) + " " + map.screenY(points[i][0], points[i][1]).toFixed(1);
+    }
+    lines[e.date] = el("path", { d: d, class: "track" }, map.svg);
+    const hit = el("path", { d: d, class: "track-hit" }, map.svg);
+    hit.addEventListener("mouseenter", () => show(e.date));
+    hit.addEventListener("mouseleave", () => show(chosen));
+    hit.addEventListener("click", () => select(e.date));
+  });
+
+  // The detail under the map follows the mouse (a preview); a click keeps an eclipse there.
+  const detail = document.getElementById("ahead-detail");
+  let chosen = facts.upcoming[0].date;
+
+  function select(date) {
+    chosen = date;
+    show(date);
+  }
+
+  function show(date) {
+    const position = facts.upcoming.findIndex((e) => e.date === date);
+    const e = facts.upcoming[position];
+    Object.keys(lines).forEach((key) => lines[key].classList.toggle("on", key === date));
+    if (lines[date]) { map.svg.appendChild(lines[date]); }
+
+    const towns = townCount[date] || 0;
+    detail.innerHTML = "";
+    const main = document.createElement("div");
+    main.className = "detail-main";
+    main.appendChild(clockFace(e.duration_s));
+    main.insertAdjacentHTML("beforeend",
+      "<div class='detail-text'><b>" + dateText(e.date) + "</b>" +
+      "<span>" + fmtDuration(e.duration_s) + " of totality on the central line</span>" +
+      "<span>Magnitude " + e.magnitude.toFixed(4) + "</span>" +
+      "<span>Crosses " + towns.toLocaleString("en") + " of the " + TOWNS.split("\n").length.toLocaleString("en") + " towns of 15,000 people or more</span></div>");
+    detail.appendChild(main);
+
+    const buttons = document.createElement("div");
+    buttons.className = "detail-buttons";
+    const earlier = document.createElement("button");
+    earlier.textContent = "← Earlier";
+    earlier.disabled = position === 0;
+    earlier.addEventListener("click", () => select(facts.upcoming[position - 1].date));
+    earlier.addEventListener("mouseleave", () => show(chosen));
+    const later = document.createElement("button");
+    later.textContent = "Later →";
+    later.disabled = position === facts.upcoming.length - 1;
+    later.addEventListener("click", () => select(facts.upcoming[position + 1].date));
+    buttons.append(earlier, later);
+    detail.appendChild(buttons);
+  }
+
   function render() {
     box.innerHTML = "";
     const list = facts.upcoming.slice();
@@ -763,12 +879,14 @@ function drawAhead() {
       const item = document.createElement("div");
       item.className = "clock-item";
       item.setAttribute("tabindex", 0);
+      item.dataset.date = e.date;
       item.appendChild(clockFace(e.duration_s));
       item.insertAdjacentHTML("beforeend", "<span class='clock-time'>" + fmtDuration(e.duration_s) + "</span><span class='clock-date'>" + dateText(e.date) + "</span>");
       attachTip(item, eclipseTip(e));
       box.appendChild(item);
     });
   }
+  select(chosen);
 
   function setMode(sortByDate) {
     byDate = sortByDate;
@@ -779,35 +897,6 @@ function drawAhead() {
   document.getElementById("button-date").addEventListener("click", () => setMode(true));
   document.getElementById("button-longest").addEventListener("click", () => setMode(false));
   render();
-}
-
-function setupEclipseWipe() {
-  const wipe = document.getElementById("eclipse-wipe");
-  const lastStory = document.getElementById("case-2");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  function update() {
-    const width = window.innerWidth, height = window.innerHeight;
-    const radius = Math.max(width, Math.sqrt(width * width + height * height) / 2 * 1.05);
-
-    let progress = (height - lastStory.getBoundingClientRect().bottom) / (height * 1.5);
-    progress = Math.max(0, Math.min(1, progress));
-    progress = progress * progress * (3 - 2 * progress);
-    if (reduceMotion) {
-      progress = progress > 0.5 ? 1 : 0;
-    }
-
-    const centreY = (height + radius) - progress * (height / 2 + radius);
-    wipe.style.display = progress === 0 ? "none" : "block";
-    wipe.style.width = radius * 2 + "px";
-    wipe.style.height = radius * 2 + "px";
-    wipe.style.marginLeft = -radius + "px";
-    wipe.style.top = (centreY - radius) + "px";
-  }
-
-  window.addEventListener("scroll", update);
-  window.addEventListener("resize", update);
-  update();
 }
 
 function fillText() {
@@ -856,5 +945,4 @@ drawStrips();
 drawWorld();
 drawCases();
 drawAhead();
-setupEclipseWipe();
 fillText();
