@@ -22,4 +22,4 @@ Created as part of *Introduction to Information Design* at Aalto University, Oct
 6. **Development.** HTML, CSS and JavaScript.
 
 
-*Available on desktop.*
+### Available on desktop.
