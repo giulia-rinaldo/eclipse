@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Xanh+Mono:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23000'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23000'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -36,7 +36,7 @@
 
   <section class="screen">
 
-    <p class="prose first">A solar eclipse happens when the Moon passes between the Sun and Earth and blocks some of the Sun's light. From the place where the Moon's shadow falls, the Sun looks partly or completely covered. <br><br> The figure below shows it from that place: move the slider and watch the Moon cross the Sun.</p>
+    <p class="prose first">A solar eclipse happens when the Moon passes between the Sun and Earth and blocks some of the Sun's light. From the place where the Moon's shadow falls, the Sun looks partly or completely covered. <br><br> The figure below shows it from that place. The figure stays in place while you keep scrolling, and the Moon crosses the Sun as you go. You can also take the slider and move it yourself.</p>
 
     <figure class="frame no-bottom">
       <div class="frame-top centred"><b>What is a solar eclipse?</b></div>
@@ -96,19 +96,25 @@
     </figure>
   </section>
 
+  <div class="eclipsed">
   <section class="screen" id="ahead-section">
     <h2>Totality, ahead</h2>
     <p class="prose" id="ahead-claim"></p>
 
-    <figure class="frame">
-      <div class="frame-top centred"><b>The <span data-fill="upcomingCount"></span> total eclipses still to come before 2100, each represented as a clock showing the duration of totality.</b></div>
+    <figure class="frame no-bottom">
+      <div class="frame-top"></div>
+      <div id="ahead-map"></div>
+      <div class="ahead-detail" id="ahead-detail" aria-live="polite"></div>
+      <div class="frame-bottom"></div>
+    </figure>
+
+    <div class="clocks-block">
       <div class="legend" id="ahead-legend" role="group" aria-label="Order the clocks">
         <button id="button-date" aria-pressed="true">By date</button>
         <button id="button-longest" aria-pressed="false">Longest first</button>
       </div>
       <div class="clocks small" id="ahead"></div>
-      <div class="frame-bottom"></div>
-    </figure>
+    </div>
   </section>
 
   <section class="screen" id="sources">
@@ -116,11 +122,11 @@
     <ul class="prose">
       <li>Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC), <a href="https://eclipse.gsfc.nasa.gov/SEcat5/catalog.html">Five Millennium Catalog of Solar Eclipses</a>: <a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE-0599--0500.html">599–500 BCE</a> · <a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE1901-2000.html">1901–2000</a> · <a href="https://eclipse.gsfc.nasa.gov/SEcat5/SE2001-2100.html">2001–2100</a>.</li>
       <li>Catalogue maps in chapter 3: NASA's Five Millennium Canon of Solar Eclipses (Espenak &amp; Meeus), shown here in black and white. <a href="https://eclipse.gsfc.nasa.gov/SEcat5/catalog.html">Originals in colour</a>.</li>
-      <li>Paths of the 51 total eclipses still to come (Figure 4): the northern and southern limits in NASA's <a href="https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2027Aug02Tpath.html">path tables</a> (Fred Espenak). Towns of 15,000 people or more: <a href="https://www.geonames.org">GeoNames</a>, licence CC BY 4.0. Continents: <a href="https://www.naturalearthdata.com/">Natural Earth</a> 1:110m land.</li>
+      <li>Paths of the 51 total eclipses still to come (Figure 4, and the central lines drawn on the map of the last chapter): the northern and southern limits in NASA's <a href="https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2027Aug02Tpath.html">path tables</a> (Fred Espenak). Towns of 15,000 people or more: <a href="https://www.geonames.org">GeoNames</a>, licence CC BY 4.0. Continents: <a href="https://www.naturalearthdata.com/">Natural Earth</a> 1:110m land.</li>
     </ul>
     <ul class="prose">
-      <li>NASA Science, <a href="https://science.nasa.gov/eclipses/types/">Types of Solar Eclipses</a> (the descriptions of total, annular, partial and hybrid eclipses, copied word for word).</li>
-      <li>NASA Eclipse Web Site, <a href="https://eclipse.gsfc.nasa.gov/SEhelp/SEglossary.html">Solar eclipse glossary</a> (umbra, penumbra, antumbra, eclipse types).</li>
+      <li>NASA Science, <a href="https://science.nasa.gov/eclipses/types/">Types of Solar Eclipses</a>.</li>
+      <li>NASA Eclipse Web Site, <a href="https://eclipse.gsfc.nasa.gov/SEhelp/SEglossary.html">Solar eclipse glossary</a>.</li>
       <li>Querejeta, M. (2011), “On the Eclipse of Thales, Cycles and Probabilities”, <i>Culture and Cosmos</i> 15(1), 5–16. <a href="https://arxiv.org/abs/1307.2095">arXiv:1307.2095</a>. Quotes Herodotus, <i>Histories</i> 1.74, and Pliny, <i>Natural History</i> 2.53.</li>
       <li>Dyson, F. W., Eddington, A. S. &amp; Davidson, C. (1920), <i>Philosophical Transactions of the Royal Society A</i> 220, 291. <a href="https://doi.org/10.1098/rsta.1920.0009">doi:10.1098/rsta.1920.0009</a>.</li>
       <li>Longair, M. (2015), “Bending space-time: a commentary on Dyson, Eddington and Davidson (1920)”, <i>Philosophical Transactions of the Royal Society A</i> 373. <a href="https://doi.org/10.1098/rsta.2014.0287">doi:10.1098/rsta.2014.0287</a>.</li>
@@ -129,20 +135,20 @@
     </ul>
 
     <p class="kicker">Considerations on the data</p>
-    <p class="prose">First, a duration is a measurement on the central line at greatest eclipse. For the 585 BCE eclipse NASA gives 6 minutes 4 seconds, measured in the North Atlantic. The armies fighting in Anatolia saw a different time and the catalogue can't say which.</p>
-    <p class="prose">Second, the catalogue records what happens and when, not why. It gives dates, types, magnitudes and durations and it does not explain the differences between one eclipse and another.</p>
-    <p class="prose">Third, the future is a prediction. NASA says the largest uncertainty in its predictions comes from changes in Earth's rotation, so the further away the date, the less certain the exact time.</p>
-    <p class="prose">Three smaller limits also apply. Dates before 15 October 1582 are in the Julian calendar and years are numbered astronomically: there is a year 0, and 585 BCE is written −584. The coordinates in the catalogue mark the point of greatest eclipse, not the whole path. And whether Thales predicted the 585 BCE eclipse is disputed; only its date is treated as established.</p>
-    <p class="byline">Giulia Rinaldo<span>Introduction to Information Design · Aalto University</span><span>Professor: Jonatan Hildén</span></p>
+    <p class="prose">First, a duration is a measurement on the central line at the moment of greatest eclipse. For the 585 BCE eclipse NASA gives 6 minutes 4 seconds, measured in the North Atlantic. The armies fighting in Anatolia saw something different and the catalogue can't tell us what.</p>
+    <p class="prose">Second, the catalogue tells us what happens and when, but not why. It gives dates, types, magnitudes and durations and it doesn't explain why one eclipse differs from the next.</p>
+    <p class="prose">Third, the future is a prediction. NASA says the biggest uncertainty comes from changes in Earth's rotation, so the further away a date is, the less sure we can be of the exact time.</p>
+    <p class="prose">A few smaller limits are worth knowing too. Dates before 15 October 1582 are in the Julian calendar and years are counted the astronomical way: there is a year 0, so 585 BCE is written −584. The coordinates in the catalogue mark the point of greatest eclipse, not the whole path. And whether Thales really predicted the 585 BCE eclipse is still disputed; only its date is treated as established.</p>
+    <p class="byline">Giulia Rinaldo<span>Introduction to Information Design · Aalto University</span><span>Professor: Jonatan Hildén</span><span>October 2026</span></p>
   </section>
-
-  <div id="eclipse-wipe" aria-hidden="true"></div>
+  </div>
 
   <div id="tip" role="tooltip"></div>
 
   <script src="data.js"></script>
   <script src="towns.js"></script>
   <script src="world.js"></script>
+  <script src="tracks.js"></script>
   <script src="cases.js"></script>
   <script src="script.js"></script>
 </body>
